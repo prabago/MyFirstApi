@@ -54,7 +54,7 @@ x-ibm-configuration:
       value: 'https://uinames.com'
       description: ''
       encoded: false
-  gateway: micro-gateway
+  gateway: datapower-gateway
 paths:
   /:
     get:
