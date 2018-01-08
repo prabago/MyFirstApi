@@ -2,7 +2,7 @@ product: 1.0.0
 info:
   name: uinames-product
   title: uinames product
-  version: 1.0.0
+  version: 3.0.0
   categories:
     - Tools / People / Names
 apis:
