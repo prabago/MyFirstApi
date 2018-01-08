@@ -1,0 +1,502 @@
+swagger: '2.0'
+info:
+  x-ibm-name: uinames
+  title: uinames
+  version: 6.0.0
+schemes:
+  - https
+consumes:
+  - application/xml
+  - application/json
+produces:
+  - application/xml
+  - application/json
+securityDefinitions:
+  Client-Secret:
+    type: apiKey
+    description: ''
+    in: header
+    name: X-IBM-Client-Secret
+  Client-Id:
+    type: apiKey
+    description: ''
+    in: header
+    name: X-IBM-Client-Id
+security:
+  - Client-Secret: []
+    Client-Id: []
+x-ibm-configuration:
+  testable: true
+  enforced: true
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - switch:
+          title: switch
+          case:
+            - condition: (request.headers.uuid===undefined)
+              execute:
+                - throw:
+                    title: throw
+                    version: 1.0.0
+                    name: NotUUID
+            - otherwise:
+                - invoke:
+                    target-url: $(target-url)$(target-path)$(request.search)
+                - activity-log:
+                    title: activity-log
+                    content: payload
+                    error-content: payload
+                    version: 1.0.0
+                - switch:
+                    title: switch
+                    case:
+                      - condition: >-
+                          apim.getvariable('request.content-type') ==
+                          'application/xml'
+                        execute:
+                          - map:
+                              title: map
+                              inputs:
+                                input:
+                                  schema:
+                                    description: ''
+                                    type: object
+                                    properties:
+                                      name:
+                                        type: string
+                                      surname:
+                                        type: string
+                                      gender:
+                                        type: string
+                                      region:
+                                        type: string
+                                      age:
+                                        type: number
+                                      title:
+                                        type: string
+                                      phone:
+                                        type: string
+                                      birthday:
+                                        type: object
+                                        properties:
+                                          dmy:
+                                            type: string
+                                          mdy:
+                                            type: string
+                                          raw:
+                                            type: number
+                                      email:
+                                        type: string
+                                      photo:
+                                        type: string
+                                    example: |-
+                                      {
+                                          "name": "Isabella",
+                                          "surname": "Anderson",
+                                          "gender": "female",
+                                          "region": "England",
+                                          "age": 26,
+                                          "title": "ms",
+                                          "phone": "(609) 577 1323",
+                                          "birthday": {
+                                              "dmy": "27/04/1991",
+                                              "mdy": "04/27/1991",
+                                              "raw": 672759521
+                                          },
+                                          "email": "isabella-91@example.com",
+                                          "photo": "https://uinames.com/api/photos/female/22.jpg"
+                                      }
+                                  variable: message.body
+                                  content: application/json
+                              outputs:
+                                output:
+                                  schema:
+                                    description: ''
+                                    type: object
+                                    properties:
+                                      userId:
+                                        type: string
+                                      name:
+                                        type: string
+                                      surname:
+                                        type: string
+                                      gender:
+                                        type: string
+                                      region:
+                                        type: string
+                                      age:
+                                        type: number
+                                      title:
+                                        type: string
+                                      phone:
+                                        type: string
+                                      birthday:
+                                        type: object
+                                        properties:
+                                          dmy:
+                                            type: string
+                                          mdy:
+                                            type: string
+                                          raw:
+                                            type: number
+                                      email:
+                                        type: string
+                                      photo:
+                                        type: string
+                                    example: |2-
+                                        {
+                                          "userId": "ianderson", 
+                                          "name": "Isabella",
+                                          "surname": "Anderson",
+                                          "gender": "female",
+                                          "region": "England",
+                                          "age": 26,
+                                          "title": "ms",
+                                          "phone": "(609) 577 1323",
+                                          "birthday": {
+                                              "dmy": "27/04/1991",
+                                              "mdy": "04/27/1991",
+                                              "raw": 672759521
+                                          },
+                                          "email": "isabella-91@example.com",
+                                          "photo": "https://uinames.com/api/photos/female/22.jpg"
+                                      }
+                                  variable: message.body
+                                  content: application/json
+                              actions:
+                                - set: output.userId
+                                  from:
+                                    - input.name
+                                    - input.surname
+                                  value: >-
+                                    $(input.name).substring(0, 1).toLowerCase()
+                                    + $(input.surname).toLowerCase()
+                                - set: output.name
+                                  from: input.name
+                                - set: output.surname
+                                  from: input.surname
+                                - set: output.gender
+                                  from: input.gender
+                                - set: output.region
+                                  from: input.region
+                                - set: output.age
+                                  from: input.age
+                                - set: output.title
+                                  from: input.title
+                                - set: output.phone
+                                  from: input.phone
+                                - set: output.birthday
+                                  from: input.birthday
+                                - set: output.birthday.dmy
+                                  from: input.birthday.dmy
+                                - set: output.birthday.mdy
+                                  from: input.birthday.mdy
+                                - set: output.birthday.raw
+                                  from: input.birthday.raw
+                                - set: output.email
+                                  from: input.email
+                                - set: output.photo
+                                  from: input.photo
+                              version: 1.0.0
+                          - gatewayscript:
+                              title: json-content-type
+                              version: 1.0.0
+                              source: >-
+                                session.name('_apimgmt').setVar('content-type',
+                                'application/xml');
+                          - json-to-xml:
+                              title: json-to-xml
+                              root-element-name: json
+                              always-output-root-element: false
+                              version: 1.0.0
+                          - redact:
+                              title: redact
+                              actions:
+                                - action: remove
+                                  from:
+                                    - all
+                                  path: //password
+                                - from:
+                                    - all
+                                  action: remove
+                                  path: //credit_card
+                              version: 1.0.0
+                      - otherwise:
+                          - gatewayscript:
+                              title: xml-content-type
+                              version: 1.0.0
+                              source: >-
+                                session.name('_apimgmt').setVar('content-type',
+                                'application/json');
+                          - redact:
+                              title: redact
+                              actions:
+                                - action: remove
+                                  from:
+                                    - all
+                                  path: '//*[@name=''password'']'
+                                - from:
+                                    - all
+                                  action: remove
+                                  path: '//*[@name=''credit_card'']'
+                              version: 1.0.0
+                          - map:
+                              title: map
+                              inputs:
+                                input:
+                                  schema:
+                                    description: ''
+                                    type: object
+                                    properties:
+                                      name:
+                                        type: string
+                                      surname:
+                                        type: string
+                                      gender:
+                                        type: string
+                                      region:
+                                        type: string
+                                      age:
+                                        type: number
+                                      title:
+                                        type: string
+                                      phone:
+                                        type: string
+                                      birthday:
+                                        type: object
+                                        properties:
+                                          dmy:
+                                            type: string
+                                          mdy:
+                                            type: string
+                                          raw:
+                                            type: number
+                                      email:
+                                        type: string
+                                      photo:
+                                        type: string
+                                    example: |-
+                                      {
+                                          "name": "Isabella",
+                                          "surname": "Anderson",
+                                          "gender": "female",
+                                          "region": "England",
+                                          "age": 26,
+                                          "title": "ms",
+                                          "phone": "(609) 577 1323",
+                                          "birthday": {
+                                              "dmy": "27/04/1991",
+                                              "mdy": "04/27/1991",
+                                              "raw": 672759521
+                                          },
+                                          "email": "isabella-91@example.com",
+                                          "photo": "https://uinames.com/api/photos/female/22.jpg"
+                                      }
+                                  variable: message.body
+                                  content: application/json
+                              outputs:
+                                output:
+                                  schema:
+                                    description: ''
+                                    type: object
+                                    properties:
+                                      userId:
+                                        type: string
+                                      name:
+                                        type: string
+                                      surname:
+                                        type: string
+                                      gender:
+                                        type: string
+                                      region:
+                                        type: string
+                                      age:
+                                        type: number
+                                      title:
+                                        type: string
+                                      phone:
+                                        type: string
+                                      birthday:
+                                        type: object
+                                        properties:
+                                          dmy:
+                                            type: string
+                                          mdy:
+                                            type: string
+                                          raw:
+                                            type: number
+                                      email:
+                                        type: string
+                                      photo:
+                                        type: string
+                                    example: |2-
+                                        {
+                                          "userId": "ianderson", 
+                                          "name": "Isabella",
+                                          "surname": "Anderson",
+                                          "gender": "female",
+                                          "region": "England",
+                                          "age": 26,
+                                          "title": "ms",
+                                          "phone": "(609) 577 1323",
+                                          "birthday": {
+                                              "dmy": "27/04/1991",
+                                              "mdy": "04/27/1991",
+                                              "raw": 672759521
+                                          },
+                                          "email": "isabella-91@example.com",
+                                          "photo": "https://uinames.com/api/photos/female/22.jpg"
+                                      }
+                                  variable: message.body
+                                  content: application/json
+                              actions:
+                                - set: output.userId
+                                  from:
+                                    - input.name
+                                    - input.surname
+                                  value: >-
+                                    $(input.name).substring(0, 1).toLowerCase()
+                                    + $(input.surname).toLowerCase()
+                                - set: output.name
+                                  from: input.name
+                                - set: output.surname
+                                  from: input.surname
+                                - set: output.gender
+                                  from: input.gender
+                                - set: output.region
+                                  from: input.region
+                                - set: output.age
+                                  from: input.age
+                                - set: output.title
+                                  from: input.title
+                                - set: output.phone
+                                  from: input.phone
+                                - set: output.birthday
+                                  from: input.birthday
+                                - set: output.birthday.dmy
+                                  from: input.birthday.dmy
+                                - set: output.birthday.mdy
+                                  from: input.birthday.mdy
+                                - set: output.birthday.raw
+                                  from: input.birthday.raw
+                                - set: output.email
+                                  from: input.email
+                                - set: output.photo
+                                  from: input.photo
+                              version: 1.0.0
+                    version: 1.0.0
+          version: 1.0.0
+    catch:
+      - errors:
+          - NotUUID
+        execute:
+          - switch:
+              title: switch
+              case:
+                - condition: >-
+                    apim.getvariable('request.content-type') ==
+                    'application/xml'
+                  execute:
+                    - set-variable:
+                        title: XMLrewriteResponse
+                        actions:
+                          - set: message.headers.content-type
+                            value: application/xml
+                          - set: message.status.code
+                            value: 400
+                          - set: message.body
+                            value: >-
+                              <?xml version="1.0" encoding="UTF-8"?>
+                              <response>    <message>El campo UUID no va
+                              informado en la cabecera</message> </response>
+                        version: 1.0.0
+                - otherwise:
+                    - set-variable:
+                        title: JSONrewriteResponse
+                        actions:
+                          - set: message.headers.content-type
+                            value: application/json
+                          - set: message.status.code
+                            value: 400
+                          - set: message.body
+                            value: >-
+                              {"message":"El campo UUID no va informado en la
+                              cabecera"}
+                        version: 1.0.0
+              version: 1.0.0
+  phase: realized
+  properties:
+    target-path:
+      value: /api/
+      description: ''
+      encoded: false
+    target-url:
+      value: 'https://uinames.com'
+      description: ''
+      encoded: false
+  gateway: datapower-gateway
+paths:
+  /:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+      parameters:
+        - $ref: '#/parameters/amount'
+        - $ref: '#/parameters/gender'
+        - $ref: '#/parameters/region'
+        - $ref: '#/parameters/minlen'
+        - $ref: '#/parameters/maxlen'
+        - $ref: '#/parameters/callback'
+        - $ref: '#/parameters/ext'
+tags: []
+basePath: /v6/api
+host: $(catalog.host)
+parameters:
+  amount:
+    name: amount
+    type: string
+    required: false
+    in: query
+    description: 'Number of names to return, between 1 and 500'
+  gender:
+    name: gender
+    type: string
+    required: false
+    in: query
+    description: Limit results to the male or female gender
+  region:
+    name: region
+    type: string
+    required: false
+    in: query
+    description: Region-specific results
+  minlen:
+    name: minlen
+    type: string
+    required: false
+    in: query
+    description: Require a minimum number of characters in a name
+  maxlen:
+    name: maxlen
+    type: string
+    required: false
+    in: query
+    description: Require a Maximun number of characters in a name
+  callback:
+    name: callback
+    type: string
+    required: false
+    in: query
+    description: 'For JSONP, specify a callback function to wrap results in'
+  ext:
+    name: ext
+    type: string
+    required: false
+    in: query
+    description: >-
+      Additional random data is served to requests passing an ext parameter. As
+      larger amounts of data require more bandwidth and processing power, please
+      use this functionality sparingly

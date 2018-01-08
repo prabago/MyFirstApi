@@ -1,0 +1,44 @@
+swagger: '2.0'
+info:
+  x-ibm-name: pokemon
+  title: pokemon
+  version: 1.0.0
+schemes:
+  - https
+host: $(catalog.host)
+basePath: /api
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  clientIdHeader:
+    type: apiKey
+    in: header
+    name: X-IBM-Client-Id
+security:
+  - clientIdHeader: []
+x-ibm-configuration:
+  testable: true
+  enforced: true
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - invoke:
+          target-url: 'https://pokemons.mybluemix.net/api/pokemons'
+      - activity-log:
+          title: activity-log
+          content: payload
+          error-content: payload
+          version: 1.0.0
+    catch: []
+  gateway: datapower-gateway
+paths:
+  /pokemons:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+definitions: {}
+tags: []

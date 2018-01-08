@@ -1,0 +1,49 @@
+product: 1.0.0
+info:
+  name: uinames-product
+  title: uinames product
+  version: 1.0.0
+  categories:
+    - Tools / People / Names
+apis:
+  uinames:
+    $ref: uinames_5.0.0.yaml
+  uinames_1:
+    $ref: uinames_2.0.yaml
+  uinames_2:
+    $ref: uinames_3.0.0.yaml
+  uinames_3:
+    $ref: uinames_1.0.0.yaml
+  uinames_4:
+    $ref: uinames_4.0.0.yaml
+  uinames_5:
+    $ref: uinames_6.0.0.yaml
+visibility:
+  view:
+    type: public
+  subscribe:
+    type: authenticated
+plans:
+  Oro:
+    title: Oro
+    apis: {}
+    approval: true
+  Plata:
+    title: Plata
+    apis: {}
+    rate-limits:
+      Plata Rate limits:
+        value: 1000/1hour
+        hard-limit: true
+    approval: true
+  Bronce:
+    title: Bronce
+    description: Bronce
+    approval: false
+    rate-limits:
+      rate-limit-1:
+        value: 1000/1day
+        hard-limit: true
+    burst-limits:
+      burst-limit-1:
+        value: 100/1minute

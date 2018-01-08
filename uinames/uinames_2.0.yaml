@@ -1,0 +1,114 @@
+swagger: '2.0'
+info:
+  x-ibm-name: uinames
+  title: uinames
+  version: 2.0.0
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  Client-Secret:
+    type: apiKey
+    description: ''
+    in: header
+    name: X-IBM-Client-Secret
+  Client-Id:
+    type: apiKey
+    description: ''
+    in: header
+    name: X-IBM-Client-Id
+security:
+  - Client-Secret: []
+    Client-Id: []
+x-ibm-configuration:
+  testable: true
+  enforced: true
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - activity-log:
+          title: activity-log
+          content: payload
+          error-content: payload
+          version: 1.0.0
+      - invoke:
+          target-url: $(target-url)$(target-path)$(request.search)
+    catch: []
+  phase: realized
+  properties:
+    target-path:
+      value: /api/
+      description: ''
+      encoded: false
+    target-url:
+      value: 'https://uinames.com'
+      description: ''
+      encoded: false
+  gateway: datapower-gateway
+paths:
+  /:
+    get:
+      responses:
+        '200':
+          description: 200 OK
+      parameters:
+        - $ref: '#/parameters/amount'
+        - $ref: '#/parameters/gender'
+        - $ref: '#/parameters/region'
+        - $ref: '#/parameters/minlen'
+        - $ref: '#/parameters/maxlen'
+        - $ref: '#/parameters/callback'
+        - $ref: '#/parameters/ext'
+tags: []
+basePath: /v2/api
+host: $(catalog.host)
+parameters:
+  amount:
+    name: amount
+    type: string
+    required: false
+    in: query
+    description: 'Number of names to return, between 1 and 500'
+  gender:
+    name: gender
+    type: string
+    required: false
+    in: query
+    description: Limit results to the male or female gender
+  region:
+    name: region
+    type: string
+    required: false
+    in: query
+    description: Region-specific results
+  minlen:
+    name: minlen
+    type: string
+    required: false
+    in: query
+    description: Require a minimum number of characters in a name
+  maxlen:
+    name: maxlen
+    type: string
+    required: false
+    in: query
+    description: Require a Maximun number of characters in a name
+  callback:
+    name: callback
+    type: string
+    required: false
+    in: query
+    description: 'For JSONP, specify a callback function to wrap results in'
+  ext:
+    name: ext
+    type: string
+    required: false
+    in: query
+    description: >-
+      Additional random data is served to requests passing an ext parameter. As
+      larger amounts of data require more bandwidth and processing power, please
+      use this functionality sparingly
